@@ -31,6 +31,32 @@ const run = async () => {
       const products = await cursor.toArray();
       res.send(products);
     });
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const product = await productCollection.findOne(query);
+      res.send(product);
+    });
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const product = req.body;
+      const updateProduct = {
+        $set: {
+          name: product.name,
+          price: product.price,
+          productURL: product.productURL,
+        },
+      };
+      const result = await productCollection.updateOne(
+        filter,
+        updateProduct,
+        options
+      );
+      res.send(result);
+      console.log(result);
+    });
     app.delete("/products/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
